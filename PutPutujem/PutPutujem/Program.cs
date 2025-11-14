@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System.ComponentModel.Design;
+using System.Globalization;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
@@ -229,6 +230,8 @@ namespace PutPutujem
                 {"trips", new List<int>()}
             };
 
+            users.Add(newUser);
+
             Console.WriteLine("Korisnik uspjesno dodan!");
         }
 
@@ -283,6 +286,7 @@ namespace PutPutujem
         {
             Console.WriteLine("1 - Brisanje po ID-u");
             Console.WriteLine("2 - Brisanje po imenu i prezimenu");
+            Console.Write("Odabir: ");
             if (!int.TryParse(Console.ReadLine(), out int answer) || !(answer == 1 || answer == 2))
             {
                 Console.WriteLine("Neispravan unos! Ponovi");
@@ -346,6 +350,7 @@ namespace PutPutujem
             Console.WriteLine("1 - Promjena imena");
             Console.WriteLine("2 - Promjena prezimena");
             Console.WriteLine("3 - Promjena datuma rodjenja");
+            Console.Write("Odabir: ");
             if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 4)
             {
                 string? check;
@@ -418,7 +423,37 @@ namespace PutPutujem
 
         static void listAllUsers(List<Dictionary<string, object>> users)
         {
+            Console.WriteLine("1 - Ispis po prezimenu abecedno");
+            Console.WriteLine("2 - Ispis korisnika starijih od 20 godina");
+            Console.WriteLine("3 - Ispis korisnika koji imaju barem 2 putovanja");
+            Console.Write("Odabir: ");
 
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 4)
+            {
+                var sorted = new List<Dictionary<string, object>>();
+                switch (answer)
+                {
+                    case 1:
+                        sorted = users.OrderBy(u => (string)u["lastName"]).ToList();
+                        break;
+                    
+                    case 2:
+                        sorted = users.Where(u => (DateTime)u["birthDate"] < DateTime.Now.AddYears(-20)).ToList();
+                        break;
+                    
+                    case 3:
+                        sorted = users.Where(u => ((List<int>)u["trips"]).Count >= 2).ToList();
+                        break;
+
+                }
+                printUsersList(sorted);
+            }
+        }
+
+        static void printUsersList(List<Dictionary<string,object>> users)
+        {
+            foreach(var user in users)
+            Console.WriteLine($"{user["id"]} - {user["firstName"]} - {user["lastName"]} - {((DateTime)user["birthDate"]).ToString("yyyy-MM-dd")}");
         }
 
     }
