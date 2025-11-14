@@ -137,12 +137,12 @@ namespace PutPutujem
                     case 2:
                         deleteUser(users);
                         break;
-                        //case 3:
-                        //    editUser(users);
-                        //    break;
-                        //case 4:
-                        //    listAllUsers(users);
-                        //    break;
+                    case 3:
+                        editUser(users);
+                        break;
+                    case 4:
+                        listAllUsers(users);
+                        break;
                 }
             }
             else aboutUsers(users);
@@ -159,30 +159,30 @@ namespace PutPutujem
 
             Console.Write("\nOdabir: ");
 
-            //if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 6)
-            //{
-            //    switch (answer)
-            //    {
-            //        case 0:
-            //            return;
-            //        case 1:
-            //            createNewTrip(trips);
-            //            break;
-            //        case 2:
-            //            deleteTrip(trips);
-            //            break;
-            //        case 3:
-            //            editTrip(trips);
-            //            break;
-            //        case 4:
-            //            listAllTrips(trips);
-            //            break;
-            //        case 5:
-            //            getReports(trips);
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 6)
+            {
+                //switch (answer)
+                //{
+                //    case 0:
+                //        return;
+                //    case 1:
+                //        createNewTrip(trips);
+                //        break;
+                //    case 2:
+                //        deleteTrip(trips);
+                //        break;
+                //    case 3:
+                //        editTrip(trips);
+                //        break;
+                //    case 4:
+                //        listAllTrips(trips);
+                //        break;
+                //    case 5:
+                //        getReports(trips);
 
-            //    }
-            //}
-            //else aboutTrips(trips);
+                //}
+            }
+            else aboutTrips(trips);
         }
 
 
@@ -310,7 +310,6 @@ namespace PutPutujem
                 } while (string.IsNullOrWhiteSpace(name));
 
                 string? surname;
-
                 do
                 {
                     Console.Write("Prezime: ");
@@ -324,6 +323,102 @@ namespace PutPutujem
             if (listLength == users.Count)
                 Console.WriteLine("Korisnik nije pronadjen.");
             else Console.WriteLine("Korisnik uspjesno izbrisan.");
+        }
+
+        static void editUser(List<Dictionary<string, object>> users)
+        {
+            Console.Write("ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Neispravan unos! Ponovi");
+                editUser(users);
+                return;
+            }
+
+            var user = users.Find(u => (int)u["id"] == id);
+            
+            if (user == null)
+            {
+                Console.WriteLine("Korisnik nije pronadjen!");
+                return;
+            }
+            
+            Console.WriteLine("1 - Promjena imena");
+            Console.WriteLine("2 - Promjena prezimena");
+            Console.WriteLine("3 - Promjena datuma rodjenja");
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 4)
+            {
+                string? check;
+                switch (answer)
+                {
+                    case 1:
+                        string? name;
+                        do
+                        {
+                            Console.Write("Ime: ");
+                            name = Console.ReadLine();
+                        } while (string.IsNullOrWhiteSpace(name));
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti ime korisnika?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+                        
+                        if (check == "da")
+                        {
+                            user["firstName"] = name;
+                            Console.WriteLine("Ime uspjesno promijenjeno!");
+                        }
+                        else return;
+                        break;
+
+                    case 2:
+                        string? surname;
+                        do
+                        {
+                            Console.Write("Prezime: ");
+                            surname = Console.ReadLine();
+                        } while (string.IsNullOrWhiteSpace(surname));
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti prezime korisnika?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+                        
+                        if (check == "da")
+                        {
+                            user["firstName"] = surname;
+                            Console.WriteLine("Prezime uspjesno promijenjeno!");
+                        }
+                        else return;
+                        break;
+
+                    case 3:
+                        var date = getDate("rodjenja");
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti datum rodjenja korisnika?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+
+                        if (check == "da")
+                        {
+                            user["birthDate"] = date;
+                            Console.WriteLine("Datum rodjenja uspjesno promijenjen!");
+                        }
+                        else return;
+                        break;
+                }
+            }
+
+        }
+
+        static void listAllUsers(List<Dictionary<string, object>> users)
+        {
+
         }
 
     }
