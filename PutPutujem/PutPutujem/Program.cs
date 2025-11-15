@@ -120,73 +120,79 @@ namespace PutPutujem
 
         static void aboutUsers(List<Dictionary<string, object>> users)
         {
-            Console.WriteLine("\n1 - Unos novog korisnika");
-            Console.WriteLine("2 - Brisanje korisnika");
-            Console.WriteLine("3 - Uređivanje korisnika");
-            Console.WriteLine("4 - Pregled svih korisnika");
-            Console.WriteLine("0 - Povratak na glavni izbornik");
 
-            Console.Write("\nOdabir: ");
-
-            if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 5)
+            while (true)
             {
-                switch (answer)
+                Console.WriteLine("\n1 - Unos novog korisnika");
+                Console.WriteLine("2 - Brisanje korisnika");
+                Console.WriteLine("3 - Uređivanje korisnika");
+                Console.WriteLine("4 - Pregled svih korisnika");
+                Console.WriteLine("0 - Povratak na glavni izbornik");
+
+                Console.Write("\nOdabir: ");
+
+                if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 5)
                 {
-                    case 0:
-                        return;
-                    case 1:
-                        createNewUser(users);
-                        break;
-                    case 2:
-                        deleteUser(users);
-                        break;
-                    case 3:
-                        editUser(users);
-                        break;
-                    case 4:
-                        listAllUsers(users);
-                        break;
+                    switch (answer)
+                    {
+                        case 0:
+                            return;
+                        case 1:
+                            createNewUser(users);
+                            break;
+                        case 2:
+                            deleteUser(users);
+                            break;
+                        case 3:
+                            editUser(users);
+                            break;
+                        case 4:
+                            listAllUsers(users);
+                            break;
+                    }
                 }
             }
-            else aboutUsers(users);
         }
 
         static void aboutTrips(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
         {
-            Console.WriteLine("\n1 - Unos novog putovanja");
-            Console.WriteLine("2 - Brisanje putovanja");
-            Console.WriteLine("3 - Uređivanje postojećeg putovanja");
-            Console.WriteLine("4 - Pregled svih putovanja");
-            Console.WriteLine("5 - Izvještaji i analize");
-            Console.WriteLine("0 - Povratak na glavni izbornik");
 
-            Console.Write("\nOdabir: ");
-
-            if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 6)
+            while (true)
             {
-                switch (answer)
-                {
-                    case 0:
-                        return;
-                    case 1:
-                        createNewTrip(trips, users);
-                        break;
-                    case 2:
-                        deleteTrip(trips, users);
-                        break;
-                    case 3:
-                        editTrip(trips);
-                        break;
-                    case 4:
-                        listAllTrips(trips);
-                        break;
-                    case 5:
-                        getReports(trips, users);
-                        break;
+                Console.WriteLine("\n1 - Unos novog putovanja");
+                Console.WriteLine("2 - Brisanje putovanja");
+                Console.WriteLine("3 - Uređivanje postojećeg putovanja");
+                Console.WriteLine("4 - Pregled svih putovanja");
+                Console.WriteLine("5 - Izvještaji i analize");
+                Console.WriteLine("0 - Povratak na glavni izbornik");
 
+                Console.Write("\nOdabir: ");
+
+                if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 6)
+                {
+                    switch (answer)
+                    {
+                        case 0:
+                            return;
+                        case 1:
+                            createNewTrip(trips, users);
+                            break;
+                        case 2:
+                            deleteTrip(trips, users);
+                            break;
+                        case 3:
+                            editTrip(trips);
+                            break;
+                        case 4:
+                            listAllTrips(trips);
+                            break;
+                        case 5:
+                            getReports(trips, users);
+                            break;
+
+                    }
                 }
             }
-            else aboutTrips(trips, users);
         }
 
 
@@ -223,6 +229,7 @@ namespace PutPutujem
             users.Add(newUser);
 
             Console.WriteLine("Korisnik uspjesno dodan!");
+            Console.ReadKey();
         }
 
         static DateTime getDate(string target)
@@ -332,6 +339,7 @@ namespace PutPutujem
             if (listLength == users.Count)
                 Console.WriteLine("Korisnik nije pronadjen.");
             else Console.WriteLine("Korisnik uspjesno izbrisan.");
+            Console.ReadKey();
         }
 
         static void editUser(List<Dictionary<string, object>> users)
@@ -423,7 +431,9 @@ namespace PutPutujem
                         break;
                 }
             }
+            else Console.WriteLine("Krivi unos");
 
+            Console.ReadKey();
         }
 
         static void listAllUsers(List<Dictionary<string, object>> users)
@@ -453,6 +463,8 @@ namespace PutPutujem
                 }
                 printUsersList(sorted);
             }
+            else Console.WriteLine("Neispravan unos");
+            Console.ReadKey();
         }
 
         static void printUsersList(List<Dictionary<string,object>> users)
@@ -478,6 +490,7 @@ namespace PutPutujem
             if (user == null)
             {
                 Console.WriteLine("Korisnik nije pronadjen!");
+                Console.ReadKey();
                 return;
             }
 
@@ -516,7 +529,8 @@ namespace PutPutujem
             trips.Add(newTrip);
 
             ((List<int>)user["trips"]).Add((int)newTrip["id"]);
-
+            Console.WriteLine("Putovanje uspjesno dodano");
+            Console.ReadKey();
         }
 
         static void deleteTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
@@ -547,7 +561,11 @@ namespace PutPutujem
                             } while (check != "da" && check != "ne");
 
                             if (check == "da")
+                            {
                                 trips.RemoveAll(t => (int)t["id"] == id);
+                                foreach (var user in users)
+                                    ((List<int>)user["trips"]).RemoveAll(x => x == id);
+                            }
                             else return;
                         }
                         break;
@@ -564,7 +582,15 @@ namespace PutPutujem
                             } while (check != "da" && check != "ne");
 
                             if (check == "da")
-                                trips.RemoveAll(t => Convert.ToSingle(t["totalFuelPrice"]) > amount);
+                            {
+                                var toRemove = trips.Where(t => Convert.ToSingle(t["totalFuelPrice"]) > amount).ToList();
+
+                                var toRemoveIds = toRemove.Select(t => (int)t["id"]).ToList();
+                                foreach (var user in users)
+                                    ((List<int>)user["trips"]).RemoveAll(x => toRemoveIds.Contains(x));
+
+                                trips.RemoveAll(t => toRemoveIds.Contains((int)t["id"]));
+                            }
                             else return;
                         }
                         break;
@@ -581,7 +607,15 @@ namespace PutPutujem
                             } while (check != "da" && check != "ne");
 
                             if (check == "da")
-                                trips.RemoveAll(t => Convert.ToSingle(t["totalFuelPrice"]) < amount);
+                            {
+                                var toRemove = trips.Where(t => Convert.ToSingle(t["totalFuelPrice"]) < amount).ToList();
+
+                                var toRemoveIds = toRemove.Select(t => (int)t["id"]).ToList();
+                                foreach (var user in users)
+                                    ((List<int>)user["trips"]).RemoveAll(x => toRemoveIds.Contains(x));
+
+                                trips.RemoveAll(t => toRemoveIds.Contains((int)t["id"]));
+                            }
                             else return;
                         }
                         break;
@@ -592,6 +626,7 @@ namespace PutPutujem
                 else Console.WriteLine("Uspjesno obrisano.");
             } 
             else Console.WriteLine("Neispravan unos.");
+            Console.ReadKey();
         }
 
         static void editTrip(List<Dictionary<string, object>> trips)
@@ -708,6 +743,8 @@ namespace PutPutujem
 
                 trip["totalFuelPrice"] = Convert.ToSingle(trip["fuelSpent"]) * Convert.ToSingle(trip["fuelPricePerL"]);
             }
+            else Console.WriteLine("Neispravan unos");
+            Console.ReadKey();
 
         }
 
@@ -759,6 +796,7 @@ namespace PutPutujem
                 printTripsList(sorted);
             }
             else Console.WriteLine("Neispravan unos");
+            Console.ReadKey();
         }
 
         static void getReports(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
@@ -821,6 +859,7 @@ namespace PutPutujem
                 }
             }
             else Console.WriteLine("Neispravan unos");
+            Console.ReadKey();
         }
 
         static int getId(List<Dictionary<string, object>> data)
