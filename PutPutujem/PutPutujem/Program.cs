@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System.ComponentModel.Design;
+using System.Diagnostics.Contracts;
 using System.Globalization;
 using System.Reflection;
 using System.Reflection.Metadata;
@@ -20,7 +21,7 @@ namespace PutPutujem
                     {"tripDate", new DateTime(2013, 5, 2)},
                     {"distance", 150},
                     {"fuelSpent", 10},
-                    {"fuelPricePerL", 1.4},
+                    {"fuelPricePerL", 1.4f},
                     {"totalFuelPrice", 14}
                 },
                 new Dictionary<string, object>
@@ -29,7 +30,7 @@ namespace PutPutujem
                     {"tripDate", new DateTime(2017, 2, 12)},
                     {"distance", 450},
                     {"fuelSpent", 25},
-                    {"fuelPricePerL", 1.2},
+                    {"fuelPricePerL", 1.2f},
                     {"totalFuelPrice", 30}
                 },
                 new Dictionary<string, object>
@@ -38,7 +39,7 @@ namespace PutPutujem
                     {"tripDate", new DateTime(2018, 12, 23)},
                     {"distance", 148},
                     {"fuelSpent", 10},
-                    {"fuelPricePerL", 1.3},
+                    {"fuelPricePerL", 1.3f},
                     {"totalFuelPrice", 13}
                 },
                 new Dictionary<string, object>
@@ -47,8 +48,8 @@ namespace PutPutujem
                     {"tripDate", new DateTime(2021, 7, 20)},
                     {"distance", 330},
                     {"fuelSpent", 18},
-                    {"fuelPricePerL", 1.4},
-                    {"totalFuelPrice", 25.2}
+                    {"fuelPricePerL", 1.4f},
+                    {"totalFuelPrice", 25.2f}
                 },
                 new Dictionary<string, object>
                 {
@@ -56,8 +57,8 @@ namespace PutPutujem
                     {"tripDate", new DateTime(2025, 10, 10)},
                     {"distance", 58},
                     {"fuelSpent", 3},
-                    {"fuelPricePerL", 1.45},
-                    {"totalFuelPrice", 4.35}
+                    {"fuelPricePerL", 1.45f},
+                    {"totalFuelPrice", 4.35f}
                 }
             };
 
@@ -563,7 +564,7 @@ namespace PutPutujem
                             } while (check != "da" && check != "ne");
 
                             if (check == "da")
-                                trips.RemoveAll(t => (float)t["totalFuelPrice"] > amount);
+                                trips.RemoveAll(t => Convert.ToSingle(t["totalFuelPrice"]) > amount);
                             else return;
                         }
                         break;
@@ -580,7 +581,7 @@ namespace PutPutujem
                             } while (check != "da" && check != "ne");
 
                             if (check == "da")
-                                trips.RemoveAll(t => (float)t["totalFuelPrice"] < amount);
+                                trips.RemoveAll(t => Convert.ToSingle(t["totalFuelPrice"]) < amount);
                             else return;
                         }
                         break;
@@ -705,14 +706,58 @@ namespace PutPutujem
                         break;
                 }
 
-                trip["totalFuelPrice"] = (float)trip["fuelSpent"] * (float)trip["fuelPricePerL"];
+                trip["totalFuelPrice"] = Convert.ToSingle(trip["fuelSpent"]) * Convert.ToSingle(trip["fuelPricePerL"]);
             }
 
         }
 
         static void listAllTrips(List<Dictionary<string, object>> trips)
         {
+            Console.WriteLine("\n1 - Ispisi po redu");
+            Console.WriteLine("2 - Po trosku uzlazno");
+            Console.WriteLine("3 - Po trosku silazno");
+            Console.WriteLine("4 - Po kilometrazi uzlazno");
+            Console.WriteLine("5 - Po kilometrazi silazno");
+            Console.WriteLine("6 - Po datumu uzlazno");
+            Console.WriteLine("7 - Po datumu silazno");
 
+            Console.Write("Odabir: ");
+
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 8)
+            {
+                var sorted = new List<Dictionary<string, object>>();
+                switch (answer)
+                {
+                    case 1:
+                        sorted = trips;
+                        break;
+
+                    case 2:
+                        sorted = trips.OrderBy(t => Convert.ToSingle(t["totalFuelPrice"])).ToList();
+                        break;
+
+                    case 3:
+                        sorted = trips.OrderByDescending(t => Convert.ToSingle(t["totalFuelPrice"])).ToList();
+                        break;
+
+                    case 4:
+                        sorted = trips.OrderBy(t => Convert.ToSingle(t["distance"])).ToList();
+                        break;
+
+                    case 5:
+                        sorted = trips.OrderByDescending(t => Convert.ToSingle(t["distance"])).ToList();
+                        break;
+
+                    case 6:
+                        sorted = trips.OrderBy(t => (DateTime)t["tripDate"]).ToList();
+                        break;
+
+                    case 7:
+                        sorted = trips.OrderByDescending(t => (DateTime)t["tripDate"]).ToList();
+                        break;
+                }
+                printTripsList(sorted);
+            }
         }
 
         static void getReports(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
@@ -731,6 +776,20 @@ namespace PutPutujem
                 else return i;
             }
         }
+
+        static void printTripsList(List<Dictionary<string, object>> trips)
+        {
+            foreach (var trip in trips) 
+            {
+                Console.WriteLine($"\nPutovanje #{trip["id"]}");
+                Console.WriteLine($"Datum: {((DateTime)trip["tripDate"]).ToShortDateString()}");
+                Console.WriteLine($"Kilometri: {trip["distance"]}");
+                Console.WriteLine($"Gorivo: {trip["fuelSpent"]} L");
+                Console.WriteLine($"Cijena po litru: {trip["fuelPricePerL"]} EUR");
+                Console.WriteLine($"Ukupno: {trip["totalFuelPrice"]} EUR");
+            } 
+        }
+
 
     }
 }
