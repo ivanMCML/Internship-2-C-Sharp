@@ -290,7 +290,7 @@ namespace PutPutujem
                 {
                     do
                     {
-                        Console.WriteLine("Jesi li siguran da želiš promijeniti ime korisnika?(da/ne)");
+                        Console.WriteLine("Jesi li siguran da želiš izbirsati korisnika?(da/ne)");
                         check = Console.ReadLine().ToLower();
                     } while (check != "da" && check != "ne");
 
@@ -317,7 +317,7 @@ namespace PutPutujem
 
                 do
                 {
-                    Console.WriteLine("Jesi li siguran da želiš promijeniti ime korisnika?(da/ne)");
+                    Console.WriteLine("Jesi li siguran da želiš izbrisati korisnika?(da/ne)");
                     check = Console.ReadLine().ToLower();
                 } while (check != "da" && check != "ne");
 
@@ -517,12 +517,77 @@ namespace PutPutujem
 
         static void deleteTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
         {
+            int listLength = trips.Count;
 
-        }
+            Console.WriteLine("\n1 - Brisanje po ID-u");
+            Console.WriteLine("2 - Brisanje putovanja skupljih od unesenog iznosa");
+            Console.WriteLine("3 - Brisanje putovanja jeftinijih od unesenog iznosa");
 
-        static void editTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
-        {
+            Console.Write("Odabir: ");
 
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 4)
+            {
+                string check;
+
+                switch (answer)
+                { 
+                    case 1:
+                        Console.Write("ID: ");
+
+                        if (int.TryParse(Console.ReadLine(), out int id))
+                        {
+                            do
+                            {
+                                Console.WriteLine("Jesi li siguran da želiš izbirsati putovanje?(da/ne)");
+                                check = Console.ReadLine().ToLower();
+                            } while (check != "da" && check != "ne");
+
+                            if (check == "da")
+                                trips.RemoveAll(t => (int)t["id"] == id);
+                            else return;
+                        }
+                        break;
+
+                    case 2:
+                        Console.Write("Iznos: ");
+
+                        if (float.TryParse(Console.ReadLine(), out float amount))
+                        {
+                            do
+                            {
+                                Console.WriteLine("Jesi li siguran da želiš izbirsati putovanja?(da/ne)");
+                                check = Console.ReadLine().ToLower();
+                            } while (check != "da" && check != "ne");
+
+                            if (check == "da")
+                                trips.RemoveAll(t => (float)t["totalFuelPrice"] > amount);
+                            else return;
+                        }
+                        break;
+
+                    case 3:
+                        Console.Write("Iznos: ");
+
+                        if (float.TryParse(Console.ReadLine(), out amount))
+                        {
+                            do
+                            {
+                                Console.WriteLine("Jesi li siguran da želiš izbirsati putovanja?(da/ne)");
+                                check = Console.ReadLine().ToLower();
+                            } while (check != "da" && check != "ne");
+
+                            if (check == "da")
+                                trips.RemoveAll(t => (float)t["totalFuelPrice"] < amount);
+                            else return;
+                        }
+                        break;
+                }
+
+                if (listLength == trips.Count)
+                    Console.WriteLine("Putovanje nije pronadjeno.");
+                else Console.WriteLine("Uspjesno obrisano.");
+            } 
+            else Console.WriteLine("Neispravan unos.");
         }
 
         static void editTrip(List<Dictionary<string, object>> trips)
