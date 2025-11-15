@@ -758,11 +758,69 @@ namespace PutPutujem
                 }
                 printTripsList(sorted);
             }
+            else Console.WriteLine("Neispravan unos");
         }
 
         static void getReports(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
         {
+            Console.WriteLine("\n1 - Ukupna potrosnja goriva");
+            Console.WriteLine("2 - Ukupni troskovi goriva");
+            Console.WriteLine("3 - Prosjecna potrosnja goriva L/100km");
+            Console.WriteLine("4 - Putovanje s najvecom potrosnjom goriva");
+            Console.WriteLine("5 - Pregled putovanja na odredjeni datum");
 
+            Console.Write("Odabir: ");
+
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 8)
+            {
+                float sum = 0f;
+
+                switch (answer)
+                {
+                    case 1:
+                        foreach(var trip in trips)
+                            sum += Convert.ToSingle(trip["fuelSpent"]);
+                        
+                        Console.WriteLine($"Ukupno je potroseno {sum} l goriva.");
+                        break;
+
+                    case 2:
+                        foreach (var trip in trips)
+                            sum += Convert.ToSingle(trip["totalFuelPrice"]);
+
+                        Console.WriteLine($"Ukupno je potroseno {sum} EUR na gorivo.");
+                        break;
+
+                    case 3:
+                        float totalDistance = 0;
+                        foreach (var trip in trips)
+                        {
+                            sum += Convert.ToSingle(trip["fuelSpent"]);
+                            totalDistance += Convert.ToSingle(trip["distance"]);
+                        }
+                        Console.WriteLine($"Prosjecna potrosnja je {(sum/totalDistance) * 100}L/100km");
+                        break;
+
+                    case 4:
+                        var maxFuelSpent = trips.OrderByDescending(t => Convert.ToSingle(t["fuelSpent"])).First();
+                        Console.WriteLine($"\nPutovanje #{maxFuelSpent["id"]}");
+                        Console.WriteLine($"Datum: {((DateTime)maxFuelSpent["tripDate"]).ToShortDateString()}");
+                        Console.WriteLine($"Kilometri: {maxFuelSpent["distance"]}");
+                        Console.WriteLine($"Gorivo: {maxFuelSpent["fuelSpent"]} L");
+                        Console.WriteLine($"Cijena po litru: {maxFuelSpent["fuelPricePerL"]} EUR");
+                        Console.WriteLine($"Ukupno: {maxFuelSpent["totalFuelPrice"]} EUR"); 
+                        break;
+
+                    case 5:
+                        var date = getDate("putovanja");
+                        var tripOnDate = trips.Where(t => (DateTime)t["tripDate"] == date).ToList();
+                        printTripsList(tripOnDate);
+                        break;
+
+                   
+                }
+            }
+            else Console.WriteLine("Neispravan unos");
         }
 
         static int getId(List<Dictionary<string, object>> data)
