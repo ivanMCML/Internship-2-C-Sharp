@@ -18,45 +18,45 @@ namespace PutPutujem
                     {"id", 1},
                     {"tripDate", new DateTime(2013, 5, 2)},
                     {"distance", 150},
-                    {"gasSpent", 10},
-                    {"gasPricePerL", 1.4},
-                    {"totalGasPrice", 14}
+                    {"fuelSpent", 10},
+                    {"fuelPricePerL", 1.4},
+                    {"totalFuelPrice", 14}
                 },
                 new Dictionary<string, object>
                 {
                     {"id", 2},
                     {"tripDate", new DateTime(2017, 2, 12)},
                     {"distance", 450},
-                    {"gasSpent", 25},
-                    {"gasPricePerL", 1.2},
-                    {"totalGasPrice", 30}
+                    {"fuelSpent", 25},
+                    {"fuelPricePerL", 1.2},
+                    {"totalFuelPrice", 30}
                 },
                 new Dictionary<string, object>
                 {
                     {"id", 3},
                     {"tripDate", new DateTime(2018, 12, 23)},
                     {"distance", 148},
-                    {"gasSpent", 10},
-                    {"gasPricePerL", 1.3},
-                    {"totalGasPrice", 13}
+                    {"fuelSpent", 10},
+                    {"fuelPricePerL", 1.3},
+                    {"totalFuelPrice", 13}
                 },
                 new Dictionary<string, object>
                 {
                     {"id", 4},
                     {"tripDate", new DateTime(2021, 7, 20)},
                     {"distance", 330},
-                    {"gasSpent", 18},
-                    {"gasPricePerL", 1.4},
-                    {"totalGasPrice", 25.2}
+                    {"fuelSpent", 18},
+                    {"fuelPricePerL", 1.4},
+                    {"totalFuelPrice", 25.2}
                 },
                 new Dictionary<string, object>
                 {
                     {"id", 5},
                     {"tripDate", new DateTime(2025, 10, 10)},
                     {"distance", 58},
-                    {"gasSpent", 3},
-                    {"gasPricePerL", 1.45},
-                    {"totalGasPrice", 4.35}
+                    {"fuelSpent", 3},
+                    {"fuelPricePerL", 1.45},
+                    {"totalFuelPrice", 4.35}
                 }
             };
 
@@ -97,7 +97,7 @@ namespace PutPutujem
                 if (choice == 1)
                     aboutUsers(users);
                 else if (choice == 2)
-                    aboutTrips(trips);
+                    aboutTrips(trips, users);
                 else return;
             }
         }
@@ -105,7 +105,7 @@ namespace PutPutujem
 
         static int mainMenu()
         {
-            Console.WriteLine("1 - Korisnici");
+            Console.WriteLine("\n1 - Korisnici");
             Console.WriteLine("2 - Putovanja");
             Console.WriteLine("0 - Izlaz iz aplikacije");
 
@@ -149,7 +149,7 @@ namespace PutPutujem
             else aboutUsers(users);
         }
 
-        static void aboutTrips(List<Dictionary<string, object>> trips)
+        static void aboutTrips(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
         {
             Console.WriteLine("\n1 - Unos novog putovanja");
             Console.WriteLine("2 - Brisanje putovanja");
@@ -162,28 +162,29 @@ namespace PutPutujem
 
             if (int.TryParse(Console.ReadLine(), out int answer) && answer >= 0 && answer < 6)
             {
-                //switch (answer)
-                //{
-                //    case 0:
-                //        return;
-                //    case 1:
-                //        createNewTrip(trips);
-                //        break;
-                //    case 2:
-                //        deleteTrip(trips);
-                //        break;
-                //    case 3:
-                //        editTrip(trips);
-                //        break;
-                //    case 4:
-                //        listAllTrips(trips);
-                //        break;
-                //    case 5:
-                //        getReports(trips);
+                switch (answer)
+                {
+                    case 0:
+                        return;
+                    case 1:
+                        createNewTrip(trips, users);
+                        break;
+                    case 2:
+                        deleteTrip(trips, users);
+                        break;
+                    case 3:
+                        editTrip(trips);
+                        break;
+                    case 4:
+                        listAllTrips(trips);
+                        break;
+                    case 5:
+                        getReports(trips, users);
+                        break;
 
-                //}
+                }
             }
-            else aboutTrips(trips);
+            else aboutTrips(trips, users);
         }
 
 
@@ -208,22 +209,8 @@ namespace PutPutujem
 
             var date = getDate("rodjenja");
 
-            int i = 0;
-            int id;
-            while (true)
-            {
-                i++;
-                if (users.Any(u => (int)u["id"] == i))
-                    continue;
-                else
-                {
-                    id = i;
-                    break;
-                }
-            }
-
             var newUser = new Dictionary<string, object> {
-                {"id", id},
+                {"id", getId(users)},
                 {"firstName", name},
                 {"lastName", surname},
                 {"birthDate", date },
@@ -234,8 +221,6 @@ namespace PutPutujem
 
             Console.WriteLine("Korisnik uspjesno dodan!");
         }
-
-
 
         static DateTime getDate(string target)
         {
@@ -284,7 +269,7 @@ namespace PutPutujem
 
         static void deleteUser(List<Dictionary<string, object>> users)
         {
-            Console.WriteLine("1 - Brisanje po ID-u");
+            Console.WriteLine("\n1 - Brisanje po ID-u");
             Console.WriteLine("2 - Brisanje po imenu i prezimenu");
             Console.Write("Odabir: ");
             if (!int.TryParse(Console.ReadLine(), out int answer) || !(answer == 1 || answer == 2))
@@ -295,13 +280,23 @@ namespace PutPutujem
             }
 
             int listLength = users.Count;
+            string? check;
 
             if (answer == 1)
             {
                 Console.Write("ID: ");
+               
                 if (int.TryParse(Console.ReadLine(), out int id))
                 {
-                    users.RemoveAll(u => (int)u["id"] == id);
+                    do
+                    {
+                        Console.WriteLine("Jesi li siguran da želiš promijeniti ime korisnika?(da/ne)");
+                        check = Console.ReadLine().ToLower();
+                    } while (check != "da" && check != "ne");
+
+                    if (check == "da")
+                        users.RemoveAll(u => (int)u["id"] == id);
+                    else return;
                 }
             }
             else
@@ -320,8 +315,15 @@ namespace PutPutujem
                     surname = Console.ReadLine();
                 } while (string.IsNullOrWhiteSpace(surname));
 
+                do
+                {
+                    Console.WriteLine("Jesi li siguran da želiš promijeniti ime korisnika?(da/ne)");
+                    check = Console.ReadLine().ToLower();
+                } while (check != "da" && check != "ne");
 
-                users.RemoveAll(u => (string)u["firstName"] == name && (string)u["lastName"] == surname);
+                if (check == "da")
+                    users.RemoveAll(u => (string)u["firstName"] == name && (string)u["lastName"] == surname);
+                else return;
             }
 
             if (listLength == users.Count)
@@ -347,7 +349,7 @@ namespace PutPutujem
                 return;
             }
             
-            Console.WriteLine("1 - Promjena imena");
+            Console.WriteLine("\n1 - Promjena imena");
             Console.WriteLine("2 - Promjena prezimena");
             Console.WriteLine("3 - Promjena datuma rodjenja");
             Console.Write("Odabir: ");
@@ -423,7 +425,7 @@ namespace PutPutujem
 
         static void listAllUsers(List<Dictionary<string, object>> users)
         {
-            Console.WriteLine("1 - Ispis po prezimenu abecedno");
+            Console.WriteLine("\n1 - Ispis po prezimenu abecedno");
             Console.WriteLine("2 - Ispis korisnika starijih od 20 godina");
             Console.WriteLine("3 - Ispis korisnika koji imaju barem 2 putovanja");
             Console.Write("Odabir: ");
@@ -453,7 +455,101 @@ namespace PutPutujem
         static void printUsersList(List<Dictionary<string,object>> users)
         {
             foreach(var user in users)
-            Console.WriteLine($"{user["id"]} - {user["firstName"]} - {user["lastName"]} - {((DateTime)user["birthDate"]).ToString("yyyy-MM-dd")}");
+                Console.WriteLine($"{user["id"]} - {user["firstName"]} - {user["lastName"]} - {((DateTime)user["birthDate"]).ToString("yyyy-MM-dd")}");
+        }
+
+
+        static void createNewTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
+        {
+
+            Console.Write("ID korisnika: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Neispravan unos! Ponovi");
+                createNewTrip(trips, users);
+                return;
+            }
+
+            var user = users.Find(u => (int)u["id"] == id);
+            if (user == null)
+            {
+                Console.WriteLine("Korisnik nije pronadjen!");
+                return;
+            }
+
+            var date = getDate("putovanja");
+
+            float distance;
+            do
+            {
+                Console.Write("Kilometraza: ");
+            }
+            while (!float.TryParse(Console.ReadLine(), out distance) || distance <= 0);
+
+            float fuel;
+            do
+            {
+                Console.Write("Potroseno gorivo: ");
+            }
+            while (!float.TryParse(Console.ReadLine(), out fuel) || fuel <= 0);
+
+            float fuelPrice;
+            do
+            {
+                Console.Write("Cijena goriva po litru: ");
+            }
+            while (!float.TryParse(Console.ReadLine(), out fuelPrice) || fuelPrice <= 0);
+
+            var newTrip = new Dictionary<string, object> {
+                {"id", getId(trips)},
+                {"tripDate", date},
+                {"distance", distance},
+                {"fuelSpent", fuel},
+                {"fuelPricePerL", fuelPrice},
+                {"totalFuelPrice", fuel * fuelPrice}
+            };
+
+            trips.Add(newTrip);
+
+            ((List<int>)user["trips"]).Add((int)newTrip["id"]);
+
+        }
+
+        static void deleteTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
+        {
+
+        }
+
+        static void editTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
+        {
+
+        }
+
+        static void editTrip(List<Dictionary<string, object>> trips)
+        {
+
+        }
+
+        static void listAllTrips(List<Dictionary<string, object>> trips)
+        {
+
+        }
+
+        static void getReports(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
+        {
+
+        }
+
+        static int getId(List<Dictionary<string, object>> data)
+        {
+            int i = 0;
+            while (true)
+            {
+                i++;
+                if (data.Any(d => (int)d["id"] == i))
+                    continue;
+                else return i;
+            }
         }
 
     }
