@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualBasic.FileIO;
 using System.ComponentModel.Design;
 using System.Globalization;
+using System.Reflection;
 using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 
@@ -186,6 +187,7 @@ namespace PutPutujem
             }
             else aboutTrips(trips, users);
         }
+
 
 
         static void createNewUser(List<Dictionary<string, object>> users)
@@ -459,6 +461,7 @@ namespace PutPutujem
         }
 
 
+
         static void createNewTrip(List<Dictionary<string, object>> trips, List<Dictionary<string, object>> users)
         {
 
@@ -592,6 +595,118 @@ namespace PutPutujem
 
         static void editTrip(List<Dictionary<string, object>> trips)
         {
+            Console.Write("ID putovanja: ");
+            if (!int.TryParse(Console.ReadLine(), out int id))
+            {
+                Console.WriteLine("Neispravan unos! Ponovi");
+                editTrip(trips);
+                return;
+            }
+
+            var trip = trips.Find(u => (int)u["id"] == id);
+
+            if (trip == null)
+            {
+                Console.WriteLine("Putovanje nije pronadjeno!");
+                return;
+            }
+
+            Console.WriteLine("\n1 - Promjena datuma");
+            Console.WriteLine("2 - Promjena kilometraze");
+            Console.WriteLine("3 - Promjena potrosenog goriva");
+            Console.WriteLine("4 - Promjena cijene goriva");
+            Console.Write("Odabir: ");
+            if (int.TryParse(Console.ReadLine(), out int answer) && answer > 0 && answer < 5)
+            {
+                string? check;
+                switch (answer)
+                {
+                    case 1:
+                        var date = getDate("putovanja");
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti datum putovanja?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+
+                        if (check == "da")
+                        {
+                            trip["tripDate"] = date;
+                            Console.WriteLine("Datum uspjesno promijenjen!");
+                        }
+                        else return;
+                        break;
+
+                    case 2:
+                        float distance;
+                        do
+                        {
+                            Console.Write("Kilometraza: ");
+                        }
+                        while (!float.TryParse(Console.ReadLine(), out distance) || distance <= 0);
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti kilometrazu putovanja?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+
+                        if (check == "da")
+                        {
+                            trip["distance"] = distance;
+                            Console.WriteLine("Kilometraza uspjesno promijenjena!");
+                        }
+                        else return;
+                        break;
+
+                    case 3:
+                        float fuel;
+                        do
+                        {
+                            Console.Write("Potroseno gorivo: ");
+                        }
+                        while (!float.TryParse(Console.ReadLine(), out fuel) || fuel <= 0);
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti potroseno gorivo na putovanju?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+
+                        if (check == "da")
+                        {
+                            trip["fuelSpent"] = fuel;
+                            Console.WriteLine("Potroseno gorivo uspjesno promijenjeno!");
+                        }
+                        else return;
+                        break;
+
+                    case 4:
+                        float price;
+                        do
+                        {
+                            Console.Write("Cijena goriva: ");
+                        }
+                        while (!float.TryParse(Console.ReadLine(), out price) || price <= 0);
+
+                        do
+                        {
+                            Console.WriteLine("Jesi li siguran da želiš promijeniti cijenu goriva?(da/ne)");
+                            check = Console.ReadLine().ToLower();
+                        } while (check != "da" && check != "ne");
+
+                        if (check == "da")
+                        {
+                            trip["fuelPricePerL"] = price;
+                            Console.WriteLine("Cijena goriva uspjesno promijenjena!");
+                        }
+                        else return;
+                        break;
+                }
+
+                trip["totalFuelPrice"] = (float)trip["fuelSpent"] * (float)trip["fuelPricePerL"];
+            }
 
         }
 
